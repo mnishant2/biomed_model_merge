@@ -1,0 +1,48 @@
+# @package _group_
+
+# Configuration for the NER Span Generation Task
+
+task_name: "ner_span_generative"
+
+# Datamodule configuration
+datamodule:
+  _target_: taskmerge.src.datamodules.ner_span.NERSpanDataModule
+
+  # Path to the prepared tokenizer (must match model config)
+  tokenizer_path: ${model.tokenizer_path} # Inherit from model config
+
+  # Root directory containing train.jsonl, dev.jsonl, test.jsonl
+  # This might be overridden by SLURM scripts ($TMPDIR) or CLI
+  data_dir: "taskmerge/data/union_span/ner"
+
+  # Max sequence lengths (from spec)
+  max_input_len: 256
+  max_target_len: 64
+
+  # Fraction of training data to use (1.0 for full dataset)
+  # Can be overridden by CLI --subsample 0.1 or sweep config
+  train_fraction: 1.0
+
+  # Dataloader parameters (overridable)
+  batch_size: ${runtime.training.per_device_train_batch_size} # Link to runtime batch size
+  num_workers: 8           # Default number of workers (adjust based on system)
+  pin_memory: true
+
+  # Corresponds to model.add_token_head and cfg.model.fast_metrics in spec
+  # Should match model.add_token_head for consistency
+  generate_bio_labels: ${model.add_token_head}
+
+# Evaluation specific parameters
+evaluation:
+  # Max tokens to generate during evaluation (greedy decoding)
+  max_new_tokens: ${model.generation_config.max_new_tokens} # Link to model gen config
+
+  # Whether to run final evaluation on the test set after training
+  # Triggered by adding +run_test_eval=true to the command line
+  run_test_eval: false
+
+  # Whether to use the fast token-level metrics (if token head exists)
+  # during evaluation steps within the Trainer.
+  # Set via model.add_token_head -> datamodule.generate_bio_labels
+  # The callback will use this implicitly.
+  use_fast_metrics: ${model.add_token_head} 
