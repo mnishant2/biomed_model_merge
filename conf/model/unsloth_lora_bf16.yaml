@@ -1,0 +1,38 @@
+# @package _group_
+
+# Configuration for the Unsloth LoRA NER model (bf16)
+# Matches parameters in src/models/unsloth_lora_ner.py
+
+_target_: taskmerge.src.models.unsloth_lora_ner.UnslothLoRANER
+
+# Base model identifier on Hugging Face Hub
+base_model_id: "aaditya/Llama3-OpenBioLLM-8B"
+
+# Path to the prepared tokenizer (must match datamodule)
+tokenizer_path: "taskmerge/tokenizers/llama3_biomerge_tok"
+
+# LoRA configuration (matches spec)
+lora_r: 8
+lora_alpha: 16          # Standard practice is 2*r
+lora_dropout: 0.05
+target_modules: "all-linear" # Target all linear layers for LoRA adaptation
+
+# Whether to include the auxiliary token classification head
+# Set to true for fast metrics during development/training
+add_token_head: true
+
+# Training precision (matches runtime config)
+dtype_str: "bf16"
+
+# Quantization (spec explicitly requests no 4-bit)
+load_in_4bit: false
+
+# Enable gradient checkpointing to save memory (matches runtime config)
+gradient_checkpointing: true
+
+# --- Generation Config Defaults ---
+# These can be overridden in the trainer or evaluation scripts
+generation_config:
+  max_new_tokens: 64
+  do_sample: false      # Greedy decoding by default
+  # Add other relevant generation parameters if needed (e.g., temperature=0.0) 

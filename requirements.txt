@@ -1,0 +1,26 @@
+# Core ML Frameworks
+torch
+unsloth[cu121-ampere-torch230] # Specify CUDA/Torch version for compatibility, adjust if needed
+transformers
+accelerate
+peft
+
+# Data Handling & Processing
+datasets
+seqeval # For token classification metrics
+
+# Experiment Management & Configuration
+hydra-core
+wandb
+python-dotenv
+
+# Evaluation & Serving
+vllm
+requests
+
+# Testing
+pytest
+
+# Optional: For notebooks/debugging
+# jupyter
+# ipywidgets 
