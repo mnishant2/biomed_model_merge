@@ -1,0 +1,3 @@
+torch==2.6.0                # pin base version; local tag (+cu126) still matches
+torchvision==0.21.0
+torchaudio==2.6.0
