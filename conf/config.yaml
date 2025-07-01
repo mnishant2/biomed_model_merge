@@ -1,0 +1,29 @@
+# Main Hydra configuration file for LoRA NER training
+# This file composes the model, task, and runtime configurations
+
+defaults:
+  - model: unsloth_lora_bf16           # Default model configuration
+  - task: ner_span                     # Default task configuration  
+  - runtime: a100                      # Default runtime configuration (can override with runtime=h100)
+  - _self_                             # Include this config's settings
+
+# Global settings that can be overridden from command line
+seed: 42
+
+# Hydra configuration
+hydra:
+  job:
+    name: "ner_lora_${model.lora_r}r_${runtime.training.learning_rate}"
+  run:
+    dir: "logs/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}"
+  sweep:
+    dir: "logs/sweeps/${now:%Y-%m-%d}"
+    subdir: "${hydra:job.override_dirname}"
+
+# Optional CLI parameters (can be added via command line)
+# Example usage:
+#   python src/main.py --subsample=0.1     # Use 10% of training data
+#   python src/main.py +run_test_eval=true # Run test evaluation after training
+#   python src/main.py runtime=h100        # Use H100 runtime config
+# subsample: ${oc.env:SUBSAMPLE,1.0}       # Can be set via environment variable
+# run_test_eval: false                     # Override task.evaluation.run_test_eval 
